@@ -4,6 +4,8 @@ import 'chart.js/auto';
 import '../index.css';
 
 const Dashboard = () => {
+  const userName = localStorage.getItem('userName') || 'Guest';
+
   const stats = {
     total: 25,
     interview: 5,
@@ -17,9 +19,9 @@ const Dashboard = () => {
       {
         label: 'Status Distribution',
         data: [12, 5, 3, 5],
-        backgroundColor: ['#2563eb', '#facc15', '#22c55e', '#ef4444']
-      }
-    ]
+        backgroundColor: ['#2563eb', '#facc15', '#22c55e', '#ef4444'],
+      },
+    ],
   };
 
   const barData = {
@@ -28,14 +30,27 @@ const Dashboard = () => {
       {
         label: 'Applications Submitted',
         data: [1, 2, 4, 3, 5, 6, 4],
-        backgroundColor: '#60a5fa'
-      }
-    ]
+        backgroundColor: '#60a5fa',
+      },
+    ],
   };
 
   return (
     <div className="container">
-      <h1>📊 Dashboard Overview</h1>
+      <div className="dashboard-header">
+        <h1>Welcome, {userName} 👋</h1>
+        <button
+          onClick={() => {
+            localStorage.clear();
+            window.location.href = '/login';
+          }}
+          className="button"
+        >
+          Logout
+        </button>
+      </div>
+
+      <h2>📊 Dashboard Overview</h2>
 
       <div className="stats-grid">
         <div className="stat-card">

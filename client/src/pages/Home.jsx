@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import '../index.css';
 
 const Home = () => {
@@ -7,17 +8,17 @@ const Home = () => {
       <nav className="navbar">
         <div className="logo">JobSnap</div>
         <ul className="nav-links">
-          <li>Home</li>
-          <li>Jobs</li>
-          <li>Resume Analyzer</li>
-          <li>Dashboard</li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/login">Login</Link></li>
+          <li><Link to="/signup">Signup</Link></li>
+          <li><Link to="/dashboard">Dashboard</Link></li>
         </ul>
       </nav>
 
       <header className="hero">
         <h1>Welcome to JobSnap</h1>
         <p>Your personal job application tracker powered by AI</p>
-        <button className="cta-btn">Get Started</button>
+        <Link to="/signup"><button className="cta-btn">Get Started</button></Link>
       </header>
 
       <section className="features">
