@@ -1,25 +1,37 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const pdfParse = require('pdf-parse');
+const { upload, analyzeResume, getJobMatchScore } = require('../controllers/resumeController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// basic skill keywords
-const SKILL_KEYWORDS = ['JavaScript', 'React', 'Node', 'MongoDB', 'Python', 'SQL', 'CSS', 'HTML', 'Java', 'Docker'];
+// Resume analysis endpoint (no auth required for demo)
+router.post('/analyze', upload.single('resume'), analyzeResume);
 
-const upload = multer({ storage: multer.memoryStorage() });
+// Job match score endpoint (requires auth)
+router.post('/job-match', authMiddleware, getJobMatchScore);
 
-router.post('/analyze', upload.single('resume'), async (req, res) => {
+// Legacy endpoint for backward compatibility
+router.post('/analyze-simple', upload.single('resume'), async (req, res) => {
   try {
-    const data = await pdfParse(req.file.buffer);
-    const text = data.text;
-
-    const foundSkills = SKILL_KEYWORDS.filter(skill =>
-      text.toLowerCase().includes(skill.toLowerCase())
-    );
-
-    res.json({ skills: foundSkills });
+    const { analyzeResume } = require('../controllers/resumeController');
+    
+    // Call the new analyze function but return simplified response
+    const mockReq = { ...req };
+    const mockRes = {
+      json: (data) => {
+        if (data.success && data.data.skills) {
+          // Convert categorized skills to flat array for backward compatibility
+          const flatSkills = Object.values(data.data.skills).flat();
+          res.json({ skills: flatSkills });
+        } else {
+          res.status(500).json({ message: 'Failed to process resume' });
+        }
+      },
+      status: (code) => ({ json: (data) => res.status(code).json(data) })
+    };
+    
+    await analyzeResume(mockReq, mockRes);
   } catch (err) {
-    console.error(err);
+    console.error('Resume analysis error:', err);
     res.status(500).json({ message: 'Failed to process resume' });
   }
 });
